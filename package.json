@@ -1,5 +1,5 @@
 {
-  "name": "create-linked-clubhouse-story",
+  "name": "@nylas/create-linked-clubhouse-story",
   "version": "1.0.0",
   "description": "A GitHub Action to automatically create a linked story on Clubhouse.io",
   "main": "lib/main.js",
