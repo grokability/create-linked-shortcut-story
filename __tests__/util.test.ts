@@ -248,7 +248,7 @@ test("getClubhouseURLFromPullRequest", async () => {
 test("getClubhouseURLFromPullRequest desc", async () => {
   const payload = {
     pull_request: {
-      body: "Clubhouse story: https://app.clubhouse.io/org/story/12345",
+      body: "Clubhouse story: https://app.shortcut.com/org/story/12345",
       number: 123,
     },
     repository: {
@@ -260,7 +260,7 @@ test("getClubhouseURLFromPullRequest desc", async () => {
   };
 
   const url = await util.getClubhouseURLFromPullRequest(payload as any);
-  expect(url).toEqual("https://app.clubhouse.io/org/story/12345");
+  expect(url).toEqual("https://app.shortcut.com/org/story/12345");
 });
 
 test("getClubhouseURLFromPullRequest comment", async () => {
@@ -281,11 +281,11 @@ test("getClubhouseURLFromPullRequest comment", async () => {
     .get("/repos/octocat/example/issues/123/comments")
     .reply(200, [
       { body: "no url here, either!" },
-      { body: "Clubhouse story: https://app.clubhouse.io/org/story/12345" },
+      { body: "Clubhouse story: https://app.shortcut.com/org/story/12345" },
     ]);
 
   const url = await util.getClubhouseURLFromPullRequest(payload as any);
-  expect(url).toEqual("https://app.clubhouse.io/org/story/12345");
+  expect(url).toEqual("https://app.shortcut.com/org/story/12345");
 
   scope.done();
 });
