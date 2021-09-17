@@ -199,21 +199,21 @@ describe("createClubhouseStory", () => {
 });
 
 test.each([
-  ["ch1", "1"],
-  ["ch89/something", "89"],
-  ["ch99-something", "99"],
-  ["prefix-1/ch123", "123"],
-  ["prefix-1-ch321", "321"],
-  ["prefix/ch5678/suffix", "5678"],
-  ["prefix-ch6789/suffix-more", "6789"],
-  ["prefix/ch7890-suffix", "7890"],
-  ["prefix-ch0987-suffix-extra", "0987"],
+  ["sc-1", "1"],
+  ["sc-89/something", "89"],
+  ["sc-99-something", "99"],
+  ["prefix-1/sc-123", "123"],
+  ["prefix-1-sc-321", "321"],
+  ["prefix/sc-5678/suffix", "5678"],
+  ["prefix-sc-6789/suffix-more", "6789"],
+  ["prefix/sc-7890-suffix", "7890"],
+  ["prefix-sc-0987-suffix-extra", "0987"],
 ])("getClubhouseStoryIdFromBranchName matches %s", (branch, expected) => {
   const id = util.getClubhouseStoryIdFromBranchName(branch);
   expect(id).toEqual(expected);
 });
 
-test.each(["prefix/ch8765+suffix", "ch554X", "ach8765", "this_ch1234"])(
+test.each(["prefix/sc-8765+suffix", "sc-554X", "asc-8765", "this_sc-1234"])(
   "getClubhouseStoryIdFromBranchName does not match %s",
   (branch) => {
     const id = util.getClubhouseStoryIdFromBranchName(branch);
@@ -248,7 +248,7 @@ test("getClubhouseURLFromPullRequest", async () => {
 test("getClubhouseURLFromPullRequest desc", async () => {
   const payload = {
     pull_request: {
-      body: "Clubhouse story: https://app.clubhouse.io/org/story/12345",
+      body: "Clubhouse story: https://app.shortcut.com/org/story/12345",
       number: 123,
     },
     repository: {
@@ -260,7 +260,7 @@ test("getClubhouseURLFromPullRequest desc", async () => {
   };
 
   const url = await util.getClubhouseURLFromPullRequest(payload as any);
-  expect(url).toEqual("https://app.clubhouse.io/org/story/12345");
+  expect(url).toEqual("https://app.shortcut.com/org/story/12345");
 });
 
 test("getClubhouseURLFromPullRequest comment", async () => {
@@ -281,11 +281,11 @@ test("getClubhouseURLFromPullRequest comment", async () => {
     .get("/repos/octocat/example/issues/123/comments")
     .reply(200, [
       { body: "no url here, either!" },
-      { body: "Clubhouse story: https://app.clubhouse.io/org/story/12345" },
+      { body: "Clubhouse story: https://app.shortcut.com/org/story/12345" },
     ]);
 
   const url = await util.getClubhouseURLFromPullRequest(payload as any);
-  expect(url).toEqual("https://app.clubhouse.io/org/story/12345");
+  expect(url).toEqual("https://app.shortcut.com/org/story/12345");
 
   scope.done();
 });
