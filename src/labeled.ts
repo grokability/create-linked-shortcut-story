@@ -3,11 +3,11 @@ import { context } from "@actions/github";
 import { PullRequestLabeledEvent } from "@octokit/webhooks-types";
 import { HttpClient } from "@actions/http-client";
 import {
-  getClubhouseStoryIdFromPullRequest,
-  getClubhouseStoryById,
-  updateClubhouseStoryById,
-  getClubhouseIterationInfo,
-  getLatestMatchingClubhouseIteration,
+  getShortcutStoryIdFromPullRequest,
+  getShortcutStoryById,
+  updateShortcutStoryById,
+  getShortcutIterationInfo,
+  getLatestMatchingShortcutIteration,
   delay,
 } from "./util";
 
@@ -22,40 +22,40 @@ export default async function labeled(): Promise<void> {
     return;
   }
   core.debug(`new label on GitHub: "${newLabel}"`);
-  const clubhouseIterationInfo = getClubhouseIterationInfo(newLabel);
+  const clubhouseIterationInfo = getShortcutIterationInfo(newLabel);
   if (!clubhouseIterationInfo) {
     core.debug(`label "${newLabel}" is not configured for iteration matching`);
     return;
   }
 
-  core.debug(`Waiting 10s to ensure Clubhouse ticket has been created`);
+  core.debug(`Waiting 10s to ensure Shortcut ticket has been created`);
   await delay(10000);
-  const storyId = await getClubhouseStoryIdFromPullRequest(payload);
+  const storyId = await getShortcutStoryIdFromPullRequest(payload);
   if (!storyId) {
-    core.setFailed("Could not find Clubhouse story ID");
+    core.setFailed("Could not find Shortcut story ID");
     return;
   }
-  core.debug(`Clubhouse story ID: ${storyId}`);
+  core.debug(`Shortcut story ID: ${storyId}`);
 
   const http = new HttpClient();
-  const story = await getClubhouseStoryById(storyId, http);
+  const story = await getShortcutStoryById(storyId, http);
   if (!story) {
-    core.setFailed(`Could not get Clubhouse story ${storyId}`);
+    core.setFailed(`Could not get Shortcut story ${storyId}`);
     return;
   }
 
-  const clubhouseIteration = await getLatestMatchingClubhouseIteration(
+  const clubhouseIteration = await getLatestMatchingShortcutIteration(
     clubhouseIterationInfo,
     http
   );
   if (!clubhouseIteration) {
-    core.setFailed(`Could not find Clubhouse iteration for story ${storyId}`);
+    core.setFailed(`Could not find Shortcut iteration for story ${storyId}`);
     return;
   }
   core.debug(
-    `assigning Clubhouse iteration: "${clubhouseIteration.name}", ID ${clubhouseIteration.id}`
+    `assigning Shortcut iteration: "${clubhouseIteration.name}", ID ${clubhouseIteration.id}`
   );
-  await updateClubhouseStoryById(storyId, http, {
+  await updateShortcutStoryById(storyId, http, {
     iteration_id: clubhouseIteration.id,
   });
   core.setOutput("iteration-url", clubhouseIteration.app_url);

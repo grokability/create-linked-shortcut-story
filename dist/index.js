@@ -95,58 +95,58 @@
         return __awaiter(this, void 0, void 0, function* () {
           const payload = github_1.context.payload;
           const branchName = payload.pull_request.head.ref;
-          let storyId = util_1.getClubhouseStoryIdFromBranchName(branchName);
+          let storyId = util_1.getShortcutStoryIdFromBranchName(branchName);
           if (storyId) {
             core.debug(`found story ID ${storyId} in branch ${branchName}`);
             core.setOutput("story-id", storyId);
             return;
           }
-          const clubhouseURL = yield util_1.getClubhouseURLFromPullRequest(
+          const clubhouseURL = yield util_1.getShortcutURLFromPullRequest(
             payload
           );
           if (!clubhouseURL) {
-            core.setFailed("Clubhouse URL not found!");
+            core.setFailed("Shortcut URL not found!");
             return;
           }
-          const match = clubhouseURL.match(util_1.CLUBHOUSE_STORY_URL_REGEXP);
+          const match = clubhouseURL.match(util_1.SHORTCUT_STORY_URL_REGEXP);
           if (match) {
             storyId = match[1];
             core.setOutput("story-id", storyId);
           } else {
-            core.debug(`invalid Clubhouse URL: ${clubhouseURL}`);
+            core.debug(`invalid Shortcut URL: ${clubhouseURL}`);
             return;
           }
           const http = new http_client_1.HttpClient();
-          const story = yield util_1.getClubhouseStoryById(storyId, http);
+          const story = yield util_1.getShortcutStoryById(storyId, http);
           if (!story) {
-            core.setFailed(`Could not get Clubhouse story ${storyId}`);
+            core.setFailed(`Could not get Shortcut story ${storyId}`);
             return;
           }
-          const project = yield util_1.getClubhouseProject(
+          const project = yield util_1.getShortcutProject(
             story.project_id,
             http
           );
           if (!project) {
             core.setFailed(
-              `Could not get Clubhouse project ${story.project_id}`
+              `Could not get Shortcut project ${story.project_id}`
             );
             return;
           }
           const stateName = payload.pull_request.merged
             ? core.getInput("merged-state-name")
             : core.getInput("closed-state-name");
-          const workflowState = yield util_1.getClubhouseWorkflowState(
+          const workflowState = yield util_1.getShortcutWorkflowState(
             stateName,
             http,
             project
           );
           if (!workflowState) {
             core.setFailed(
-              `Could not find Clubhouse workflow state named ${stateName}`
+              `Could not find Shortcut workflow state named ${stateName}`
             );
             return;
           }
-          yield util_1.updateClubhouseStoryById(storyId, http, {
+          yield util_1.updateShortcutStoryById(storyId, http, {
             workflow_state_id: workflowState.id,
           });
         });
@@ -260,44 +260,44 @@
           }
           core.debug(`new label on GitHub: "${newLabel}"`);
           const clubhouseIterationInfo =
-            util_1.getClubhouseIterationInfo(newLabel);
+            util_1.getShortcutIterationInfo(newLabel);
           if (!clubhouseIterationInfo) {
             core.debug(
               `label "${newLabel}" is not configured for iteration matching`
             );
             return;
           }
-          core.debug(`Waiting 10s to ensure Clubhouse ticket has been created`);
+          core.debug(`Waiting 10s to ensure Shortcut ticket has been created`);
           yield util_1.delay(10000);
-          const storyId = yield util_1.getClubhouseStoryIdFromPullRequest(
+          const storyId = yield util_1.getShortcutStoryIdFromPullRequest(
             payload
           );
           if (!storyId) {
-            core.setFailed("Could not find Clubhouse story ID");
+            core.setFailed("Could not find Shortcut story ID");
             return;
           }
-          core.debug(`Clubhouse story ID: ${storyId}`);
+          core.debug(`Shortcut story ID: ${storyId}`);
           const http = new http_client_1.HttpClient();
-          const story = yield util_1.getClubhouseStoryById(storyId, http);
+          const story = yield util_1.getShortcutStoryById(storyId, http);
           if (!story) {
-            core.setFailed(`Could not get Clubhouse story ${storyId}`);
+            core.setFailed(`Could not get Shortcut story ${storyId}`);
             return;
           }
           const clubhouseIteration =
-            yield util_1.getLatestMatchingClubhouseIteration(
+            yield util_1.getLatestMatchingShortcutIteration(
               clubhouseIterationInfo,
               http
             );
           if (!clubhouseIteration) {
             core.setFailed(
-              `Could not find Clubhouse iteration for story ${storyId}`
+              `Could not find Shortcut iteration for story ${storyId}`
             );
             return;
           }
           core.debug(
-            `assigning Clubhouse iteration: "${clubhouseIteration.name}", ID ${clubhouseIteration.id}`
+            `assigning Shortcut iteration: "${clubhouseIteration.name}", ID ${clubhouseIteration.id}`
           );
-          yield util_1.updateClubhouseStoryById(storyId, http, {
+          yield util_1.updateShortcutStoryById(storyId, http, {
             iteration_id: clubhouseIteration.id,
           });
           core.setOutput("iteration-url", clubhouseIteration.app_url);
@@ -535,17 +535,17 @@
         return __awaiter(this, void 0, void 0, function* () {
           const payload = github_1.context.payload;
           const branchName = payload.pull_request.head.ref;
-          let storyId = util_1.getClubhouseStoryIdFromBranchName(branchName);
+          let storyId = util_1.getShortcutStoryIdFromBranchName(branchName);
           if (storyId) {
             core.debug(`found story ID ${storyId} in branch ${branchName}`);
             core.setOutput("story-id", storyId);
             return;
           }
-          const clubhouseURL = yield util_1.getClubhouseURLFromPullRequest(
+          const clubhouseURL = yield util_1.getShortcutURLFromPullRequest(
             payload
           );
           if (clubhouseURL) {
-            const match = clubhouseURL.match(util_1.CLUBHOUSE_STORY_URL_REGEXP);
+            const match = clubhouseURL.match(util_1.SHORTCUT_STORY_URL_REGEXP);
             if (match) {
               storyId = match[1];
               core.setOutput("story-id", storyId);
@@ -553,7 +553,7 @@
             return;
           }
           const http = new http_client_1.HttpClient();
-          const story = yield util_1.createClubhouseStory(payload, http);
+          const story = yield util_1.createShortcutStory(payload, http);
           if (!story) {
             return;
           }
@@ -662,30 +662,30 @@
         };
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.delay =
-        exports.getClubhouseIterationInfo =
-        exports.getLatestMatchingClubhouseIteration =
-        exports.updateClubhouseStoryById =
+        exports.getShortcutIterationInfo =
+        exports.getLatestMatchingShortcutIteration =
+        exports.updateShortcutStoryById =
         exports.addCommentToPullRequest =
-        exports.getClubhouseStoryIdFromPullRequest =
-        exports.getClubhouseURLFromPullRequest =
-        exports.getClubhouseStoryIdFromBranchName =
-        exports.createClubhouseStory =
-        exports.getClubhouseWorkflowState =
-        exports.getClubhouseProjectByName =
-        exports.getClubhouseProject =
-        exports.getClubhouseStoryById =
-        exports.getClubhouseUserId =
+        exports.getShortcutStoryIdFromPullRequest =
+        exports.getShortcutURLFromPullRequest =
+        exports.getShortcutStoryIdFromBranchName =
+        exports.createShortcutStory =
+        exports.getShortcutWorkflowState =
+        exports.getShortcutProjectByName =
+        exports.getShortcutProject =
+        exports.getShortcutStoryById =
+        exports.getShortcutUserId =
         exports.getUserListAsSet =
         exports.shouldProcessPullRequestForUser =
-        exports.CLUBHOUSE_BRANCH_NAME_REGEXP =
-        exports.CLUBHOUSE_STORY_URL_REGEXP =
+        exports.SHORTCUT_BRANCH_NAME_REGEXP =
+        exports.SHORTCUT_STORY_URL_REGEXP =
           void 0;
       const core = __importStar(__nccwpck_require__(186));
       const github = __importStar(__nccwpck_require__(438));
       const mustache_1 = __importDefault(__nccwpck_require__(272));
-      exports.CLUBHOUSE_STORY_URL_REGEXP =
+      exports.SHORTCUT_STORY_URL_REGEXP =
         /https:\/\/app.shortcut.com\/\w+\/story\/(\d+)(\/[A-Za-z0-9-]*)?/;
-      exports.CLUBHOUSE_BRANCH_NAME_REGEXP = /^(?:.+[-/])?ch(\d+)(?:[-/].+)?$/;
+      exports.SHORTCUT_BRANCH_NAME_REGEXP = /^(?:.+[-/])?ch(\d+)(?:[-/].+)?$/;
       /**
        * Convert a Map to a sorted string representation. Useful for debugging.
        *
@@ -702,13 +702,13 @@
         const onlyUsers = getUserListAsSet(core.getInput("only-users"));
         if (ignoredUsers.size === 0 && onlyUsers.size === 0) {
           core.debug(
-            "No users defined in only-users or ignored-users. Proceeding with Clubhouse workflow..."
+            "No users defined in only-users or ignored-users. Proceeding with Shortcut workflow..."
           );
           return true;
         }
         if (onlyUsers.size > 0 && ignoredUsers.size > 0) {
           if (onlyUsers.has(user) && ignoredUsers.has(user)) {
-            const errorMessage = `PR author ${user} is defined in both ignored-users and only-users lists. Cancelling Clubhouse workflow...`;
+            const errorMessage = `PR author ${user} is defined in both ignored-users and only-users lists. Cancelling Shortcut workflow...`;
             core.setFailed(errorMessage);
             throw new Error(errorMessage);
           } else {
@@ -720,7 +720,7 @@
         if (onlyUsers.size > 0) {
           if (onlyUsers.has(user)) {
             core.debug(
-              `PR author ${user} is defined in only-users list. Proceeding with Clubhouse workflow...`
+              `PR author ${user} is defined in only-users list. Proceeding with Shortcut workflow...`
             );
             return true;
           } else {
@@ -738,7 +738,7 @@
             return false;
           } else {
             core.debug(
-              `PR author ${user} is NOT defined in ignored-users list. Proceeding with Clubhouse workflow...`
+              `PR author ${user} is NOT defined in ignored-users list. Proceeding with Shortcut workflow...`
             );
             return true;
           }
@@ -756,7 +756,7 @@
         return s;
       }
       exports.getUserListAsSet = getUserListAsSet;
-      function getClubhouseUserId(githubUsername, http) {
+      function getShortcutUserId(githubUsername, http) {
         return __awaiter(this, void 0, void 0, function* () {
           const USER_MAP_STRING = core.getInput("user-map");
           if (USER_MAP_STRING) {
@@ -769,13 +769,13 @@
               core.warning("`user-map` is not valid JSON");
             }
           }
-          const CLUBHOUSE_TOKEN = core.getInput("clubhouse-token", {
+          const SHORTCUT_TOKEN = core.getInput("clubhouse-token", {
             required: true,
           });
-          let emailToClubhouseId;
+          let emailToShortcutId;
           try {
             const membersResponse = yield http.getJson(
-              `https://api.clubhouse.io/api/v3/members?token=${CLUBHOUSE_TOKEN}`
+              `https://api.clubhouse.io/api/v3/members?token=${SHORTCUT_TOKEN}`
             );
             const members = membersResponse.result;
             if (!members) {
@@ -784,7 +784,7 @@
               );
               return;
             }
-            emailToClubhouseId = members.reduce((e2id, member) => {
+            emailToShortcutId = members.reduce((e2id, member) => {
               const email = member.profile.email_address;
               const clubhouseId = member.id;
               if (email) {
@@ -793,7 +793,7 @@
               return e2id;
             }, new Map());
             core.debug(
-              `email to Clubhouse ID: ${stringFromMap(emailToClubhouseId)}`
+              `email to Shortcut ID: ${stringFromMap(emailToShortcutId)}`
             );
           } catch (err) {
             core.setFailed(
@@ -810,7 +810,7 @@
           });
           const user = userResponse.data;
           if (user.email) {
-            return emailToClubhouseId.get(user.email);
+            return emailToShortcutId.get(user.email);
           } else {
             core.warning(
               `could not get email address for GitHub user @${githubUsername}`
@@ -818,15 +818,15 @@
           }
         });
       }
-      exports.getClubhouseUserId = getClubhouseUserId;
-      function getClubhouseStoryById(id, http) {
+      exports.getShortcutUserId = getShortcutUserId;
+      function getShortcutStoryById(id, http) {
         return __awaiter(this, void 0, void 0, function* () {
-          const CLUBHOUSE_TOKEN = core.getInput("clubhouse-token", {
+          const SHORTCUT_TOKEN = core.getInput("clubhouse-token", {
             required: true,
           });
           try {
             const storyResponse = yield http.getJson(
-              `https://api.clubhouse.io/api/v3/stories/${id}?token=${CLUBHOUSE_TOKEN}`
+              `https://api.clubhouse.io/api/v3/stories/${id}?token=${SHORTCUT_TOKEN}`
             );
             const story = storyResponse.result;
             if (!story) {
@@ -843,15 +843,15 @@
           }
         });
       }
-      exports.getClubhouseStoryById = getClubhouseStoryById;
-      function getClubhouseProject(id, http) {
+      exports.getShortcutStoryById = getShortcutStoryById;
+      function getShortcutProject(id, http) {
         return __awaiter(this, void 0, void 0, function* () {
-          const CLUBHOUSE_TOKEN = core.getInput("clubhouse-token", {
+          const SHORTCUT_TOKEN = core.getInput("clubhouse-token", {
             required: true,
           });
           try {
             const projectResponse = yield http.getJson(
-              `https://api.clubhouse.io/api/v3/projects/${id}?token=${CLUBHOUSE_TOKEN}`
+              `https://api.clubhouse.io/api/v3/projects/${id}?token=${SHORTCUT_TOKEN}`
             );
             return projectResponse.result;
           } catch (err) {
@@ -862,15 +862,15 @@
           }
         });
       }
-      exports.getClubhouseProject = getClubhouseProject;
-      function getClubhouseProjectByName(projectName, http) {
+      exports.getShortcutProject = getShortcutProject;
+      function getShortcutProjectByName(projectName, http) {
         return __awaiter(this, void 0, void 0, function* () {
-          const CLUBHOUSE_TOKEN = core.getInput("clubhouse-token", {
+          const SHORTCUT_TOKEN = core.getInput("clubhouse-token", {
             required: true,
           });
           try {
             const projectsResponse = yield http.getJson(
-              `https://api.clubhouse.io/api/v3/projects?token=${CLUBHOUSE_TOKEN}`
+              `https://api.clubhouse.io/api/v3/projects?token=${SHORTCUT_TOKEN}`
             );
             const projects = projectsResponse.result;
             if (!projects) {
@@ -888,16 +888,16 @@
           }
         });
       }
-      exports.getClubhouseProjectByName = getClubhouseProjectByName;
-      function getClubhouseWorkflowState(stateName, http, project) {
+      exports.getShortcutProjectByName = getShortcutProjectByName;
+      function getShortcutWorkflowState(stateName, http, project) {
         return __awaiter(this, void 0, void 0, function* () {
-          const CLUBHOUSE_TOKEN = core.getInput("clubhouse-token", {
+          const SHORTCUT_TOKEN = core.getInput("clubhouse-token", {
             required: true,
           });
           const teamId = project.team_id;
           try {
             const teamResponse = yield http.getJson(
-              `https://api.clubhouse.io/api/v3/teams/${teamId}?token=${CLUBHOUSE_TOKEN}`
+              `https://api.clubhouse.io/api/v3/teams/${teamId}?token=${SHORTCUT_TOKEN}`
             );
             const team = teamResponse.result;
             if (!team) {
@@ -918,10 +918,10 @@
           }
         });
       }
-      exports.getClubhouseWorkflowState = getClubhouseWorkflowState;
-      function createClubhouseStory(payload, http) {
+      exports.getShortcutWorkflowState = getShortcutWorkflowState;
+      function createShortcutStory(payload, http) {
         return __awaiter(this, void 0, void 0, function* () {
-          const CLUBHOUSE_TOKEN = core.getInput("clubhouse-token", {
+          const SHORTCUT_TOKEN = core.getInput("clubhouse-token", {
             required: true,
           });
           const PROJECT_NAME = core.getInput("project-name", {
@@ -937,16 +937,16 @@
             payload,
           });
           const githubUsername = payload.pull_request.user.login;
-          const clubhouseUserId = yield getClubhouseUserId(
+          const clubhouseUserId = yield getShortcutUserId(
             githubUsername,
             http
           );
-          const clubhouseProject = yield getClubhouseProjectByName(
+          const clubhouseProject = yield getShortcutProjectByName(
             PROJECT_NAME,
             http
           );
           if (!clubhouseProject) {
-            core.setFailed(`Could not find Clubhouse project: ${PROJECT_NAME}`);
+            core.setFailed(`Could not find Shortcut project: ${PROJECT_NAME}`);
             return null;
           }
           const body = {
@@ -959,7 +959,7 @@
             body.owner_ids = [clubhouseUserId];
           }
           if (STATE_NAME) {
-            const workflowState = yield getClubhouseWorkflowState(
+            const workflowState = yield getShortcutWorkflowState(
               STATE_NAME,
               http,
               clubhouseProject
@@ -970,7 +970,7 @@
           }
           try {
             const storyResponse = yield http.postJson(
-              `https://api.clubhouse.io/api/v3/stories?token=${CLUBHOUSE_TOKEN}`,
+              `https://api.clubhouse.io/api/v3/stories?token=${SHORTCUT_TOKEN}`,
               body
             );
             const story = storyResponse.result;
@@ -997,17 +997,17 @@
           }
         });
       }
-      exports.createClubhouseStory = createClubhouseStory;
-      function getClubhouseStoryIdFromBranchName(branchName) {
-        const match = branchName.match(exports.CLUBHOUSE_BRANCH_NAME_REGEXP);
+      exports.createShortcutStory = createShortcutStory;
+      function getShortcutStoryIdFromBranchName(branchName) {
+        const match = branchName.match(exports.SHORTCUT_BRANCH_NAME_REGEXP);
         if (match) {
           return match[1];
         }
         return null;
       }
-      exports.getClubhouseStoryIdFromBranchName =
-        getClubhouseStoryIdFromBranchName;
-      function getClubhouseURLFromPullRequest(payload) {
+      exports.getShortcutStoryIdFromBranchName =
+        getShortcutStoryIdFromBranchName;
+      function getShortcutURLFromPullRequest(payload) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
           const GITHUB_TOKEN = core.getInput("github-token", {
@@ -1017,7 +1017,7 @@
           const results =
             (_a = payload.pull_request.body) === null || _a === void 0
               ? void 0
-              : _a.match(exports.CLUBHOUSE_STORY_URL_REGEXP);
+              : _a.match(exports.SHORTCUT_STORY_URL_REGEXP);
           if (results) {
             return results[0];
           }
@@ -1035,13 +1035,13 @@
             const commentWithURL = commentsResponse.data.find(
               (comment) =>
                 comment.body &&
-                exports.CLUBHOUSE_STORY_URL_REGEXP.test(comment.body)
+                exports.SHORTCUT_STORY_URL_REGEXP.test(comment.body)
             );
             if (commentWithURL) {
               const match =
                 (_b = commentWithURL.body) === null || _b === void 0
                   ? void 0
-                  : _b.match(exports.CLUBHOUSE_STORY_URL_REGEXP);
+                  : _b.match(exports.SHORTCUT_STORY_URL_REGEXP);
               if (match) {
                 return match[0];
               }
@@ -1056,27 +1056,27 @@
           return null;
         });
       }
-      exports.getClubhouseURLFromPullRequest = getClubhouseURLFromPullRequest;
-      function getClubhouseStoryIdFromPullRequest(payload) {
+      exports.getShortcutURLFromPullRequest = getShortcutURLFromPullRequest;
+      function getShortcutStoryIdFromPullRequest(payload) {
         return __awaiter(this, void 0, void 0, function* () {
           const branchName = payload.pull_request.head.ref;
-          const storyId = getClubhouseStoryIdFromBranchName(branchName);
+          const storyId = getShortcutStoryIdFromBranchName(branchName);
           if (storyId) {
             return storyId;
           }
-          const clubhouseURL = yield getClubhouseURLFromPullRequest(payload);
+          const clubhouseURL = yield getShortcutURLFromPullRequest(payload);
           if (!clubhouseURL) {
             return null;
           }
-          const match = clubhouseURL.match(exports.CLUBHOUSE_STORY_URL_REGEXP);
+          const match = clubhouseURL.match(exports.SHORTCUT_STORY_URL_REGEXP);
           if (match) {
             return match[1];
           }
           return null;
         });
       }
-      exports.getClubhouseStoryIdFromPullRequest =
-        getClubhouseStoryIdFromPullRequest;
+      exports.getShortcutStoryIdFromPullRequest =
+        getShortcutStoryIdFromPullRequest;
       function addCommentToPullRequest(payload, comment) {
         return __awaiter(this, void 0, void 0, function* () {
           const GITHUB_TOKEN = core.getInput("github-token", {
@@ -1104,14 +1104,14 @@
         });
       }
       exports.addCommentToPullRequest = addCommentToPullRequest;
-      function updateClubhouseStoryById(id, http, body) {
+      function updateShortcutStoryById(id, http, body) {
         return __awaiter(this, void 0, void 0, function* () {
-          const CLUBHOUSE_TOKEN = core.getInput("clubhouse-token", {
+          const SHORTCUT_TOKEN = core.getInput("clubhouse-token", {
             required: true,
           });
           try {
             const storyResponse = yield http.putJson(
-              `https://api.clubhouse.io/api/v3/stories/${id}?token=${CLUBHOUSE_TOKEN}`,
+              `https://api.clubhouse.io/api/v3/stories/${id}?token=${SHORTCUT_TOKEN}`,
               body
             );
             const story = storyResponse.result;
@@ -1129,15 +1129,15 @@
           }
         });
       }
-      exports.updateClubhouseStoryById = updateClubhouseStoryById;
-      function getLatestMatchingClubhouseIteration(iterationInfo, http) {
+      exports.updateShortcutStoryById = updateShortcutStoryById;
+      function getLatestMatchingShortcutIteration(iterationInfo, http) {
         return __awaiter(this, void 0, void 0, function* () {
-          const CLUBHOUSE_TOKEN = core.getInput("clubhouse-token", {
+          const SHORTCUT_TOKEN = core.getInput("clubhouse-token", {
             required: true,
           });
           try {
             const iterationsResponse = yield http.getJson(
-              `https://api.clubhouse.io/api/v3/iterations?token=${CLUBHOUSE_TOKEN}`
+              `https://api.clubhouse.io/api/v3/iterations?token=${SHORTCUT_TOKEN}`
             );
             const iterations = iterationsResponse.result;
             if (!iterations) {
@@ -1177,9 +1177,9 @@
           }
         });
       }
-      exports.getLatestMatchingClubhouseIteration =
-        getLatestMatchingClubhouseIteration;
-      function getClubhouseIterationInfo(githubLabel) {
+      exports.getLatestMatchingShortcutIteration =
+        getLatestMatchingShortcutIteration;
+      function getShortcutIterationInfo(githubLabel) {
         const LABEL_MAP_STRING = core.getInput("label-iteration-group-map");
         if (!LABEL_MAP_STRING) {
           core.warning("`label-iteration-group-map` is empty or unset");
@@ -1202,7 +1202,7 @@
           return;
         }
       }
-      exports.getClubhouseIterationInfo = getClubhouseIterationInfo;
+      exports.getShortcutIterationInfo = getShortcutIterationInfo;
       /* Use with caution! Only to resolve potential races in event handling */
       function delay(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
